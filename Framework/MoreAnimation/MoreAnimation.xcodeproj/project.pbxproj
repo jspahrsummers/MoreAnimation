@@ -44,6 +44,8 @@
 		D05A862A1423E767009A4748 /* NSOpenGLContext+MoreAnimationExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = D05A86281423E767009A4748 /* NSOpenGLContext+MoreAnimationExtensions.m */; };
 		D0863C051425BB6D00CDE087 /* MATextLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = D0863C031425BB6D00CDE087 /* MATextLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0863C061425BB6D00CDE087 /* MATextLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = D0863C041425BB6D00CDE087 /* MATextLayer.m */; };
+		D0E15DF21426BAFA00D912F3 /* NSView+MoreAnimationExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E15DF01426BAFA00D912F3 /* NSView+MoreAnimationExtensions.h */; };
+		D0E15DF31426BAFA00D912F3 /* NSView+MoreAnimationExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E15DF11426BAFA00D912F3 /* NSView+MoreAnimationExtensions.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -106,6 +108,8 @@
 		D0918649141D7564005F86FF /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		D091864A141D7564005F86FF /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		D091864B141D7564005F86FF /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		D0E15DF01426BAFA00D912F3 /* NSView+MoreAnimationExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSView+MoreAnimationExtensions.h"; sourceTree = "<group>"; };
+		D0E15DF11426BAFA00D912F3 /* NSView+MoreAnimationExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSView+MoreAnimationExtensions.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -277,6 +281,8 @@
 				D058C1DD14273AEE001672BB /* NSGraphicsContext+MoreAnimationExtensions.m */,
 				D05A86271423E767009A4748 /* NSOpenGLContext+MoreAnimationExtensions.h */,
 				D05A86281423E767009A4748 /* NSOpenGLContext+MoreAnimationExtensions.m */,
+				D0E15DF01426BAFA00D912F3 /* NSView+MoreAnimationExtensions.h */,
+				D0E15DF11426BAFA00D912F3 /* NSView+MoreAnimationExtensions.m */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -313,6 +319,7 @@
 				D05A86111423E5E0009A4748 /* EXTRuntimeExtensions.h in Headers */,
 				D05A861A1423E600009A4748 /* metamacros.h in Headers */,
 				D016125F142470BA001DFB28 /* EXTScope.h in Headers */,
+				D0E15DF21426BAFA00D912F3 /* NSView+MoreAnimationExtensions.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -433,6 +440,7 @@
 				D0161260142470BA001DFB28 /* EXTScope.m in Sources */,
 				D0863C061425BB6D00CDE087 /* MATextLayer.m in Sources */,
 				D058C1DF14273AEE001672BB /* NSGraphicsContext+MoreAnimationExtensions.m in Sources */,
+				D0E15DF31426BAFA00D912F3 /* NSView+MoreAnimationExtensions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

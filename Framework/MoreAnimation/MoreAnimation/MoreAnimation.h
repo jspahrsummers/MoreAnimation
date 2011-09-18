@@ -14,3 +14,5 @@
 #import <MoreAnimation/MAOpenGLTexture.h>
 #import <MoreAnimation/MATextLayer.h>
 #import <MoreAnimation/MAView.h>
+#import <MoreAnimation/NSOpenGLContext+MoreAnimationExtensions.h>
+#import <MoreAnimation/NSView+MoreAnimationExtensions.h>
