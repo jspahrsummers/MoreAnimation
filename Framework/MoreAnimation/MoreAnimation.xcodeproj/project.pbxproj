@@ -44,7 +44,7 @@
 		D05A862A1423E767009A4748 /* NSOpenGLContext+MoreAnimationExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = D05A86281423E767009A4748 /* NSOpenGLContext+MoreAnimationExtensions.m */; };
 		D0863C051425BB6D00CDE087 /* MATextLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = D0863C031425BB6D00CDE087 /* MATextLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0863C061425BB6D00CDE087 /* MATextLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = D0863C041425BB6D00CDE087 /* MATextLayer.m */; };
-		D0E15DF21426BAFA00D912F3 /* NSView+MoreAnimationExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E15DF01426BAFA00D912F3 /* NSView+MoreAnimationExtensions.h */; };
+		D0E15DF21426BAFA00D912F3 /* NSView+MoreAnimationExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E15DF01426BAFA00D912F3 /* NSView+MoreAnimationExtensions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0E15DF31426BAFA00D912F3 /* NSView+MoreAnimationExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E15DF11426BAFA00D912F3 /* NSView+MoreAnimationExtensions.m */; };
 /* End PBXBuildFile section */
 
@@ -314,12 +314,12 @@
 				D044F4E514243CC400C4EFCE /* MAView.h in Headers */,
 				D0863C051425BB6D00CDE087 /* MATextLayer.h in Headers */,
 				D058C1DE14273AEE001672BB /* NSGraphicsContext+MoreAnimationExtensions.h in Headers */,
+				D0E15DF21426BAFA00D912F3 /* NSView+MoreAnimationExtensions.h in Headers */,
 				D0355C5C141D700C0053AF73 /* MALayer+Private.h in Headers */,
 				D05A860D1423E5D7009A4748 /* EXTSafeCategory.h in Headers */,
 				D05A86111423E5E0009A4748 /* EXTRuntimeExtensions.h in Headers */,
 				D05A861A1423E600009A4748 /* metamacros.h in Headers */,
 				D016125F142470BA001DFB28 /* EXTScope.h in Headers */,
-				D0E15DF21426BAFA00D912F3 /* NSView+MoreAnimationExtensions.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
