@@ -44,6 +44,30 @@ void (*displayRectIgnoringOpacityInContextImpl)(NSView *, SEL, NSRect, NSGraphic
 static
 void (*drawLayerInContextImpl)(NSView *, SEL, MALayer *, CGContextRef) = NULL;
 
+// workhorse functions
+static
+void recursivelyDisplayMALayerHostingViews (NSView *view) {
+	MALayer *layer = view.MALayer;
+	if (layer) {
+		NSGraphicsContext *previousContext = [NSGraphicsContext currentContext];
+		@onExit {
+			[NSGraphicsContext setCurrentContext:previousContext];
+		};
+
+		NSGraphicsContext *context = [[view window] graphicsContext];
+		[NSGraphicsContext setCurrentContext:context];
+
+		[view lockFocus];
+		[layer renderInContext:context.graphicsPort];
+		[view unlockFocus];
+	}
+
+	NSArray *subviews = view.subviews;
+	for (NSView *view in subviews) {
+		recursivelyDisplayMALayerHostingViews(view);
+	}
+}
+
 // NSView method overrides
 @interface NSViewMAMixin : NSView {}
 @end
@@ -51,83 +75,38 @@ void (*drawLayerInContextImpl)(NSView *, SEL, MALayer *, CGContextRef) = NULL;
 @implementation NSViewMAMixin
 
 - (void)display {
-	MALayer *layer = self.MALayer;
-	if (!layer) {
-		displayImpl(self, _cmd);
-		return;
-	}
-
-	[self displayRectIgnoringOpacity:self.bounds inContext:[NSGraphicsContext currentContext]];
+	displayImpl(self, _cmd);
+  	recursivelyDisplayMALayerHostingViews(self);
 }
 
 - (void)displayIfNeeded {
-	MALayer *layer = self.MALayer;
-	if (!layer) {
-		displayIfNeededImpl(self, _cmd);
-		return;
-	}
-
-  	if (![self needsDisplay])
-		return;
-
-	[self displayRectIgnoringOpacity:self.bounds inContext:[NSGraphicsContext currentContext]];
+	displayIfNeededImpl(self, _cmd);
+  	recursivelyDisplayMALayerHostingViews(self);
 }
 
 - (void)displayIfNeededIgnoringOpacity {
-	MALayer *layer = self.MALayer;
-	if (!layer) {
-		displayIfNeededIgnoringOpacityImpl(self, _cmd);
-		return;
-	}
-
-  	if (![self needsDisplay])
-		return;
-
-	[self displayRectIgnoringOpacity:self.bounds inContext:[NSGraphicsContext currentContext]];
+	displayIfNeededIgnoringOpacityImpl(self, _cmd);
+  	recursivelyDisplayMALayerHostingViews(self);
 }
 
 - (void)displayIfNeededInRectIgnoringOpacity:(NSRect)rect {
-	MALayer *layer = self.MALayer;
-	if (!layer) {
-		displayIfNeededInRectIgnoringOpacityImpl(self, _cmd, rect);
-		return;
-	}
-
-  	if (![self needsDisplay])
-		return;
-
-	[self displayRectIgnoringOpacity:rect inContext:[NSGraphicsContext currentContext]];
+	displayIfNeededInRectIgnoringOpacityImpl(self, _cmd, rect);
+  	recursivelyDisplayMALayerHostingViews(self);
 }
 
 - (void)displayRect:(NSRect)rect {
-	MALayer *layer = self.MALayer;
-	if (!layer) {
-		displayRectImpl(self, _cmd, rect);
-		return;
-	}
-
-	[self displayRectIgnoringOpacity:rect inContext:[NSGraphicsContext currentContext]];
+	displayRectImpl(self, _cmd, rect);
+  	recursivelyDisplayMALayerHostingViews(self);
 }
 
 - (void)displayRectIgnoringOpacity:(NSRect)rect {
-	MALayer *layer = self.MALayer;
-	if (!layer) {
-		displayRectIgnoringOpacityImpl(self, _cmd, rect);
-		return;
-	}
-
-	[self displayRectIgnoringOpacity:rect inContext:[NSGraphicsContext currentContext]];
+	displayRectIgnoringOpacityImpl(self, _cmd, rect);
+  	recursivelyDisplayMALayerHostingViews(self);
 }
 
 - (void)displayRectIgnoringOpacity:(NSRect)rect inContext:(NSGraphicsContext *)context {
-	MALayer *layer = self.MALayer;
-	if (!layer) {
-		displayRectIgnoringOpacityInContextImpl(self, _cmd, rect, context);
-		return;
-	}
-
-	[layer renderInContext:context.graphicsPort];
-	[self setNeedsDisplay:NO];
+	displayRectIgnoringOpacityInContextImpl(self, _cmd, rect, context);
+  	recursivelyDisplayMALayerHostingViews(self);
 }
 
 - (void)drawLayer:(MALayer *)layer inContext:(CGContextRef)context {
@@ -145,10 +124,7 @@ void (*drawLayerInContextImpl)(NSView *, SEL, MALayer *, CGContextRef) = NULL;
 
 	NSGraphicsContext *graphicsContext = [NSGraphicsContext graphicsContextWithGraphicsPort:context flipped:NO];
 	[NSGraphicsContext setCurrentContext:graphicsContext];
-	
-  	[self lockFocus];
 	[self drawRect:self.bounds];
-	[self unlockFocus];
 }
 
 @end
