@@ -54,12 +54,19 @@ void recursivelyDisplayMALayerHostingViews (NSView *view) {
 			[NSGraphicsContext setCurrentContext:previousContext];
 		};
 
-		NSGraphicsContext *context = [[view window] graphicsContext];
+		NSWindow *window = [view window];
+
+		NSGraphicsContext *context = [window graphicsContext];
 		[NSGraphicsContext setCurrentContext:context];
 
-		[view lockFocus];
-		[layer renderInContext:context.graphicsPort];
-		[view unlockFocus];
+		CGContextRef CGContext = context.graphicsPort;
+		CGPoint translationPoint = [view convertPoint:CGPointZero toView:[window contentView]];
+
+		CGContextTranslateCTM(CGContext, translationPoint.x, translationPoint.y);
+		CGContextClearRect(CGContext, view.bounds);
+		[layer renderInContext:CGContext];
+
+		[context flushGraphics];
 	}
 
 	NSArray *subviews = view.subviews;
@@ -75,38 +82,38 @@ void recursivelyDisplayMALayerHostingViews (NSView *view) {
 @implementation NSViewMAMixin
 
 - (void)display {
-	displayImpl(self, _cmd);
   	recursivelyDisplayMALayerHostingViews(self);
+	displayImpl(self, _cmd);
 }
 
 - (void)displayIfNeeded {
-	displayIfNeededImpl(self, _cmd);
   	recursivelyDisplayMALayerHostingViews(self);
+	displayIfNeededImpl(self, _cmd);
 }
 
 - (void)displayIfNeededIgnoringOpacity {
-	displayIfNeededIgnoringOpacityImpl(self, _cmd);
   	recursivelyDisplayMALayerHostingViews(self);
+	displayIfNeededIgnoringOpacityImpl(self, _cmd);
 }
 
 - (void)displayIfNeededInRectIgnoringOpacity:(NSRect)rect {
-	displayIfNeededInRectIgnoringOpacityImpl(self, _cmd, rect);
   	recursivelyDisplayMALayerHostingViews(self);
+	displayIfNeededInRectIgnoringOpacityImpl(self, _cmd, rect);
 }
 
 - (void)displayRect:(NSRect)rect {
-	displayRectImpl(self, _cmd, rect);
   	recursivelyDisplayMALayerHostingViews(self);
+	displayRectImpl(self, _cmd, rect);
 }
 
 - (void)displayRectIgnoringOpacity:(NSRect)rect {
-	displayRectIgnoringOpacityImpl(self, _cmd, rect);
   	recursivelyDisplayMALayerHostingViews(self);
+	displayRectIgnoringOpacityImpl(self, _cmd, rect);
 }
 
 - (void)displayRectIgnoringOpacity:(NSRect)rect inContext:(NSGraphicsContext *)context {
-	displayRectIgnoringOpacityInContextImpl(self, _cmd, rect, context);
   	recursivelyDisplayMALayerHostingViews(self);
+	displayRectIgnoringOpacityInContextImpl(self, _cmd, rect, context);
 }
 
 - (void)drawLayer:(MALayer *)layer inContext:(CGContextRef)context {
@@ -189,7 +196,7 @@ void injectNSViewMAMixin (void) {
 	layer.needsRenderBlock = ^(MALayer *layerNeedingRender){
 		if (layerNeedingRender == weakLayer) {
 			dispatch_async(dispatch_get_main_queue(), ^{
-				[weakSelf setNeedsDisplay:YES];
+				recursivelyDisplayMALayerHostingViews(weakSelf);
 			});
 		}
 	};
