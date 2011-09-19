@@ -59,9 +59,12 @@ static const CGPoint anchorArray[5] = {
 	self.prettyLayer.delegate = [self weakReferenceProxy];
 	self.prettyLayer.opaque = YES;
 
-	id layerView = self.contentView;
-	self.prettyLayer.frame = CGRectInset([layerView contentLayer].frame, 20, 20);
-	[[layerView contentLayer] addSublayer:self.prettyLayer];
+	NSView *layerView = self.contentView;
+	layerView.MALayer = [[MALayer alloc] init];
+	layerView.MALayer.frame = NSRectToCGRect(layerView.bounds);
+
+	self.prettyLayer.frame = CGRectInset(layerView.MALayer.frame, 20, 20);
+	[layerView.MALayer addSublayer:self.prettyLayer];
 
 	CGRect textFrame, remainder;
 	CGRectDivide(CGRectInset(self.prettyLayer.bounds, 20, 20), &textFrame, &remainder, 100, CGRectMinYEdge);
