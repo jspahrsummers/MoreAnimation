@@ -218,7 +218,10 @@ void injectNSViewMAMixin (void) {
 		}
 	};
 
+	layer.delegate = (id<MALayerDelegate>)self;
+
   	objc_setAssociatedObject(self, NSViewAssociatedMALayerKey, layer, OBJC_ASSOCIATION_RETAIN);
+	[self setNeedsDisplay:YES];
 }
 
 @end
