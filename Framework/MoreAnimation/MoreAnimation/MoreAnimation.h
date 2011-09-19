@@ -10,6 +10,7 @@
 #import <MoreAnimation/NSOpenGLContext+MoreAnimationExtensions.h>
 #import <MoreAnimation/MALayer.h>
 #import <MoreAnimation/MAOpenGLLayer.h>
+#import <MoreAnimation/MAOpenGLProgram.h>
 #import <MoreAnimation/MAOpenGLShader.h>
 #import <MoreAnimation/MAOpenGLTexture.h>
 #import <MoreAnimation/MAOpenGLView.h>

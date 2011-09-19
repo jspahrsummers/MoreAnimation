@@ -46,6 +46,8 @@
 		D0863C061425BB6D00CDE087 /* MATextLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = D0863C041425BB6D00CDE087 /* MATextLayer.m */; };
 		D0E3A2201427EE0600870056 /* MAOpenGLShader.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E3A21E1427EE0600870056 /* MAOpenGLShader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D0E3A2211427EE0600870056 /* MAOpenGLShader.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E3A21F1427EE0600870056 /* MAOpenGLShader.m */; };
+		D0E3A23B1427FB0500870056 /* MAOpenGLProgram.h in Headers */ = {isa = PBXBuildFile; fileRef = D0E3A2391427FB0500870056 /* MAOpenGLProgram.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D0E3A23C1427FB0500870056 /* MAOpenGLProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = D0E3A23A1427FB0500870056 /* MAOpenGLProgram.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -110,6 +112,8 @@
 		D091864B141D7564005F86FF /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		D0E3A21E1427EE0600870056 /* MAOpenGLShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MAOpenGLShader.h; sourceTree = "<group>"; };
 		D0E3A21F1427EE0600870056 /* MAOpenGLShader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MAOpenGLShader.m; sourceTree = "<group>"; };
+		D0E3A2391427FB0500870056 /* MAOpenGLProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MAOpenGLProgram.h; sourceTree = "<group>"; };
+		D0E3A23A1427FB0500870056 /* MAOpenGLProgram.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MAOpenGLProgram.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -248,6 +252,8 @@
 		D044F4E214243C8D00C4EFCE /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				D0E3A2391427FB0500870056 /* MAOpenGLProgram.h */,
+				D0E3A23A1427FB0500870056 /* MAOpenGLProgram.m */,
 				D0E3A21E1427EE0600870056 /* MAOpenGLShader.h */,
 				D0E3A21F1427EE0600870056 /* MAOpenGLShader.m */,
 				D0355C58141D700C0053AF73 /* MAOpenGLTexture.h */,
@@ -315,6 +321,7 @@
 				D0863C051425BB6D00CDE087 /* MATextLayer.h in Headers */,
 				D058C1DE14273AEE001672BB /* NSGraphicsContext+MoreAnimationExtensions.h in Headers */,
 				D0E3A2201427EE0600870056 /* MAOpenGLShader.h in Headers */,
+				D0E3A23B1427FB0500870056 /* MAOpenGLProgram.h in Headers */,
 				D0355C5C141D700C0053AF73 /* MALayer+Private.h in Headers */,
 				D05A860D1423E5D7009A4748 /* EXTSafeCategory.h in Headers */,
 				D05A86111423E5E0009A4748 /* EXTRuntimeExtensions.h in Headers */,
@@ -441,6 +448,7 @@
 				D0863C061425BB6D00CDE087 /* MATextLayer.m in Sources */,
 				D058C1DF14273AEE001672BB /* NSGraphicsContext+MoreAnimationExtensions.m in Sources */,
 				D0E3A2211427EE0600870056 /* MAOpenGLShader.m in Sources */,
+				D0E3A23C1427FB0500870056 /* MAOpenGLProgram.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
