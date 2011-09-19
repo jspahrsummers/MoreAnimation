@@ -11,6 +11,8 @@
 #import "EXTScope.h"
 #import <OpenGL/gl.h>
 
+const NSInteger MAOpenGLShaderCompilationFailed = -1;
+
 @interface MAOpenGLShader ()
 // publicly readonly
 @property (nonatomic, assign, readwrite) GLuint shaderID;
@@ -80,32 +82,21 @@
 
 - (id)initWithString:(NSString *)code type:(GLenum)type GLContext:(NSOpenGLContext *)cxt; {
   	if ((self = [self initWithType:type GLContext:cxt])) {
-		__block int compileStatus = 0;
+		__block BOOL compiled = NO;
 
 		[self.GLContext executeWhileCurrentContext:^{
 			const char *UTF8Source = [code UTF8String];
 			int length = (int)[code length];
 
 			glShaderSource(self.shaderID, 1, &UTF8Source, &length);
-			glCompileShader(self.shaderID);
 
-			glGetShaderiv(self.shaderID, GL_COMPILE_STATUS, &compileStatus);
-			if (!compileStatus) {
-				int logLength = 0;
-				glGetShaderiv(self.shaderID, GL_INFO_LOG_LENGTH, &logLength);
-
-				char *log = malloc((size_t)logLength + 1);
-				@onExit {
-					free(log);
-				};
-
-				glGetShaderInfoLog(self.shaderID, logLength + 1, NULL, log);
-
-				NSLog(@"Could not compile shader type %i: %s", (int)type, log);
+			NSError *error = nil;
+			if (!(compiled = [self compileShader:&error])) {
+				NSLog(@"Could not compile shader %@: %@", self, error);
 			}
 		}];
 
-		if (!compileStatus)
+		if (!compiled)
 			return nil;
 	}
 
@@ -118,6 +109,45 @@
 	}];
 
 	self.shaderID = 0;
+}
+
+#pragma mark Error handling
+
++ (NSString *)errorDomain {
+	return @"MAOpenGLShaderErrorDomain";
+}
+
+#pragma mark Compilation
+
+- (BOOL)compileShader:(NSError **)error; {
+  	__block GLint compileStatus = 0;
+
+  	[self.GLContext executeWhileCurrentContext:^{
+		glCompileShader(self.shaderID);
+
+		glGetShaderiv(self.shaderID, GL_COMPILE_STATUS, &compileStatus);
+		if (!compileStatus) {
+			if (error) {
+				int logLength = 0;
+				glGetShaderiv(self.shaderID, GL_INFO_LOG_LENGTH, &logLength);
+
+				char *log = malloc((size_t)logLength + 1);
+				glGetShaderInfoLog(self.shaderID, logLength + 1, NULL, log);
+
+				NSString *errorDescription = [[NSString alloc] initWithBytesNoCopy:log length:(NSUInteger)logLength + 1 encoding:NSUTF8StringEncoding freeWhenDone:YES];
+
+				NSDictionary *userInfo = [NSDictionary dictionaryWithObject:errorDescription forKey:NSLocalizedDescriptionKey];
+
+				*error = [NSError
+					errorWithDomain:[[self class] errorDomain]
+					code:MAOpenGLShaderCompilationFailed
+					userInfo:userInfo
+				];
+			}
+		}
+	}];
+
+	return (compileStatus != 0);
 }
 
 @end

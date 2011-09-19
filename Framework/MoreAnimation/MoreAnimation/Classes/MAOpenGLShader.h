@@ -9,9 +9,19 @@
 #import <Cocoa/Cocoa.h>
 
 /**
+ * An error code indicating that compilation failed.
+ */
+extern const NSInteger MAOpenGLShaderCompilationFailed;
+
+/**
  * An OpenGL shader object.
  */
 @interface MAOpenGLShader : NSObject
+/**
+ * The domain for errors originating from this class.
+ */
++ (NSString *)errorDomain;
+
 /**
  * The OpenGL shader object ID associated with the receiver.
  *
@@ -80,4 +90,10 @@
  * and compiled.
  */
 - (id)initWithString:(NSString *)code type:(GLenum)type GLContext:(NSOpenGLContext *)cxt;
+
+/**
+ * Attempts to compile the shader. If an error occurs, \c NO is returned and \a
+ * error (if provided) is filled in with a description of the error.
+ */
+- (BOOL)compileShader:(NSError **)error;
 @end
