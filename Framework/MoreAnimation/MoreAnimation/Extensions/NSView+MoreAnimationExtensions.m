@@ -11,16 +11,38 @@
 #import "EXTRuntimeExtensions.h"
 #import "EXTSafeCategory.h"
 #import "EXTScope.h"
+#import <objc/runtime.h>
 
 // for associating an MALayer to an NSView
 static char * const NSViewAssociatedMALayerKey = "NSViewAssociatedMALayer";
 
 // variables for saving the old implementations
 static
-void (*originalDisplayRectInContextImpl)(NSView *, SEL, NSRect, NSGraphicsContext *) = NULL;
+void (*displayImpl)(NSView *, SEL) = NULL;
 
 static
-void (*originalDrawLayerInContextImpl)(NSView *, SEL, MALayer *, CGContextRef) = NULL;
+void (*displayIfNeededImpl)(NSView *, SEL) = NULL;
+
+static
+void (*displayIfNeededIgnoringOpacityImpl)(NSView *, SEL) = NULL;
+
+static
+void (*displayIfNeededInRectImpl)(NSView *, SEL, NSRect) = NULL;
+
+static
+void (*displayIfNeededInRectIgnoringOpacityImpl)(NSView *, SEL, NSRect) = NULL;
+
+static
+void (*displayRectImpl)(NSView *, SEL, NSRect) = NULL;
+
+static
+void (*displayRectIgnoringOpacityImpl)(NSView *, SEL, NSRect) = NULL;
+
+static
+void (*displayRectIgnoringOpacityInContextImpl)(NSView *, SEL, NSRect, NSGraphicsContext *) = NULL;
+
+static
+void (*drawLayerInContextImpl)(NSView *, SEL, MALayer *, CGContextRef) = NULL;
 
 // NSView method overrides
 @interface NSViewMAMixin : NSView {}
@@ -28,21 +50,91 @@ void (*originalDrawLayerInContextImpl)(NSView *, SEL, MALayer *, CGContextRef) =
 
 @implementation NSViewMAMixin
 
-- (void)displayRectIgnoringOpacity:(NSRect)rect inContext:(NSGraphicsContext *)context {
+- (void)display {
 	MALayer *layer = self.MALayer;
 	if (!layer) {
-		originalDisplayRectInContextImpl(self, _cmd, rect, context);
+		displayImpl(self, _cmd);
 		return;
 	}
 
-	[self.MALayer display];
+	[self displayRectIgnoringOpacity:self.bounds inContext:[NSGraphicsContext currentContext]];
+}
+
+- (void)displayIfNeeded {
+	MALayer *layer = self.MALayer;
+	if (!layer) {
+		displayIfNeededImpl(self, _cmd);
+		return;
+	}
+
+  	if (![self needsDisplay])
+		return;
+
+	[self displayRectIgnoringOpacity:self.bounds inContext:[NSGraphicsContext currentContext]];
+}
+
+- (void)displayIfNeededIgnoringOpacity {
+	MALayer *layer = self.MALayer;
+	if (!layer) {
+		displayIfNeededIgnoringOpacityImpl(self, _cmd);
+		return;
+	}
+
+  	if (![self needsDisplay])
+		return;
+
+	[self displayRectIgnoringOpacity:self.bounds inContext:[NSGraphicsContext currentContext]];
+}
+
+- (void)displayIfNeededInRectIgnoringOpacity:(NSRect)rect {
+	MALayer *layer = self.MALayer;
+	if (!layer) {
+		displayIfNeededInRectIgnoringOpacityImpl(self, _cmd, rect);
+		return;
+	}
+
+  	if (![self needsDisplay])
+		return;
+
+	[self displayRectIgnoringOpacity:rect inContext:[NSGraphicsContext currentContext]];
+}
+
+- (void)displayRect:(NSRect)rect {
+	MALayer *layer = self.MALayer;
+	if (!layer) {
+		displayRectImpl(self, _cmd, rect);
+		return;
+	}
+
+	[self displayRectIgnoringOpacity:rect inContext:[NSGraphicsContext currentContext]];
+}
+
+- (void)displayRectIgnoringOpacity:(NSRect)rect {
+	MALayer *layer = self.MALayer;
+	if (!layer) {
+		displayRectIgnoringOpacityImpl(self, _cmd, rect);
+		return;
+	}
+
+	[self displayRectIgnoringOpacity:rect inContext:[NSGraphicsContext currentContext]];
+}
+
+- (void)displayRectIgnoringOpacity:(NSRect)rect inContext:(NSGraphicsContext *)context {
+	MALayer *layer = self.MALayer;
+	if (!layer) {
+		displayRectIgnoringOpacityInContextImpl(self, _cmd, rect, context);
+		return;
+	}
+
+	[layer renderInContext:context.graphicsPort];
+	[self setNeedsDisplay:NO];
 }
 
 - (void)drawLayer:(MALayer *)layer inContext:(CGContextRef)context {
   	// 'layer' may be a CALayer, which means that NSView is meant to handle
 	// CALayerDelegate methods
 	if (![layer isKindOfClass:[MALayer class]]) {
-		originalDrawLayerInContextImpl(self, _cmd, layer, context);
+		drawLayerInContextImpl(self, _cmd, layer, context);
 		return;
 	}
 
@@ -65,7 +157,44 @@ void (*originalDrawLayerInContextImpl)(NSView *, SEL, MALayer *, CGContextRef) =
 static
 __attribute__((constructor))
 void injectNSViewMAMixin (void) {
-	ext_replaceMethodsFromClass([NSViewMAMixin class], [NSView class]);
+	IMP *savedImpls[] = {
+		(IMP *)&displayImpl,
+		(IMP *)&displayIfNeededImpl,
+		(IMP *)&displayIfNeededIgnoringOpacityImpl,
+		(IMP *)&displayIfNeededInRectImpl,
+		(IMP *)&displayIfNeededInRectIgnoringOpacityImpl,
+		(IMP *)&displayRectImpl,
+		(IMP *)&displayRectIgnoringOpacityImpl,
+		(IMP *)&displayRectIgnoringOpacityInContextImpl,
+		(IMP *)&drawLayerInContextImpl
+	};
+
+	SEL selectors[] = {
+		@selector(display),
+		@selector(displayIfNeeded),
+		@selector(displayIfNeededIgnoringOpacity),
+		@selector(displayIfNeededInRect:),
+		@selector(displayIfNeededInRectIgnoringOpacity:),
+		@selector(displayRect:),
+		@selector(displayRectIgnoringOpacity:),
+		@selector(displayRectIgnoringOpacity:inContext:),
+		@selector(drawLayer:inContext:)
+	};
+
+	size_t count = sizeof(savedImpls) / sizeof(*savedImpls);
+	Class dstClass = [NSView class];
+
+	for (size_t i = 0;i < count;++i) {
+		IMP *implPtr = savedImpls[i];
+		SEL selector = selectors[i];
+
+		Method method = class_getInstanceMethod(dstClass, selector);
+		if (method) {
+			*implPtr = method_getImplementation(method);
+		}
+	}
+
+	ext_replaceMethodsFromClass([NSViewMAMixin class], dstClass);
 }
 
 // simple additions
@@ -78,6 +207,17 @@ void injectNSViewMAMixin (void) {
 }
 
 - (void)setMALayer:(MALayer *)layer {
+	__weak id weakSelf = self;
+	__unsafe_unretained MALayer *weakLayer = layer;
+
+	layer.needsRenderBlock = ^(MALayer *layerNeedingRender){
+		if (layerNeedingRender == weakLayer) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[weakSelf setNeedsDisplay:YES];
+			});
+		}
+	};
+
   	objc_setAssociatedObject(self, NSViewAssociatedMALayerKey, layer, OBJC_ASSOCIATION_RETAIN);
 }
 
