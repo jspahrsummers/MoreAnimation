@@ -8,6 +8,7 @@
 
 #import "MALayer.h"
 #import "MALayer+Private.h"
+#import "MAGeometry.h"
 #import "EXTScope.h"
 #import <libkern/OSAtomic.h>
 
@@ -1058,18 +1059,15 @@ static const CGFloat MALayerGeometryDifferenceTolerance = 0.000001;
 	size_t bitsPerComponent = 8;
 	size_t bitsPerPixel = bitsPerComponent * components;
 	size_t bytesPerRow = width * components;
+	size_t byteCount = bytesPerRow * height;
 	CGBitmapInfo bitmapInfo = kCGBitmapByteOrder32Host | kCGImageAlphaPremultipliedLast;
-
-	uint32_t *pixels = malloc(bytesPerRow * height);
-	@onExit {
-		free(pixels);
-	};
 
 	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 	@onExit {
 		CGColorSpaceRelease(colorSpace);
 	};
 
+	uint32_t *pixels = calloc(1, byteCount);
   	CGContextRef flatContext = CGBitmapContextCreate(
 		pixels,
 		width,
@@ -1085,9 +1083,35 @@ static const CGFloat MALayerGeometryDifferenceTolerance = 0.000001;
 	[sublayer renderInContext:flatContext allowCaching:NO];
 	CGContextRelease(flatContext);
 
+	uint32_t *transformedPixels = calloc(1, byteCount);
+	@onExit {
+		free(transformedPixels);
+	};
+
+	for (size_t x = 0;x < width;++x) {
+		for (size_t y = 0;y < height;++y) {
+			MAVector3D v = MAVector3DMake(x, y, 0, 1);
+			v = MAVector3DApplyCATransform3D(v, transform);
+			v = MAVector3DDivide(v, v.w);
+
+			CGFloat fx = round((v.x * width) / (2 * v.w) + (width / 2));
+			if (fx < 0 || fx >= width)
+				continue;
+
+			CGFloat fy = round((v.y * height) / (2 * v.w) + (height / 2));
+			if (fy < 0 || fy >= height)
+				continue;
+
+			size_t dstX = (size_t)fx;
+			size_t dstY = (size_t)fy;
+			transformedPixels[dstY * width + dstX] = pixels[y * width + x];
+		}
+	}
+
+	free(pixels);
 
 	// eventually
-	CGDataProviderRef dataProvider = CGDataProviderCreateWithData(NULL, pixels, bytesPerRow * height, NULL);
+	CGDataProviderRef dataProvider = CGDataProviderCreateWithData(NULL, transformedPixels, byteCount, NULL);
 	CGImageRef image = CGImageCreate(
 		width,
 		height,
