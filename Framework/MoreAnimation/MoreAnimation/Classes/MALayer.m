@@ -124,6 +124,12 @@ static const CGFloat MALayerGeometryDifferenceTolerance = 0.000001;
 - (void)renderSublayer:(MALayer *)sublayer inContext:(CGContextRef)context allowCaching:(BOOL)allowCaching;
 
 /**
+ * Renders \a sublayer into \a context transformed by the given perspective
+ * projection matrix. This method will not cache the transformed rendering.
+ */
+- (void)renderSublayer:(MALayer *)sublayer inContext:(CGContextRef)context with3DTransform:(CATransform3D)transform;
+
+/**
  * Returns the affine transformation needed to move into the coordinate system
  * of the receiver from that of its superlayer.
  */
@@ -1020,20 +1026,86 @@ static const CGFloat MALayerGeometryDifferenceTolerance = 0.000001;
 
 - (void)renderSublayer:(MALayer *)sublayer inContext:(CGContextRef)context allowCaching:(BOOL)allowCaching; {
 	@autoreleasepool {
-		CGContextSaveGState(context);
-
-		// apply the necessary transformations to get to the sublayer
+		// TODO: this affine transform already includes the effects of
+		// sublayer.transform, which impairs our ability to use it in 3D
 		CGAffineTransform affineTransform = [self affineTransformToLayer:sublayer];
-		CGContextConcatCTM(context, affineTransform);
 
-		// now apply any sublayer transform that's been set
-		CGAffineTransform sublayerTransform = CATransform3DGetAffineTransform(self.sublayerTransform);
-		CGContextConcatCTM(context, sublayerTransform);
-
-		[sublayer renderInContext:context allowCaching:allowCaching];
-
-		CGContextRestoreGState(context);
+		CATransform3D transform = CATransform3DMakeAffineTransform(affineTransform);
+		transform = CATransform3DConcat(transform, self.sublayerTransform);
+		
+		if (CATransform3DIsAffine(transform)) {
+			CGContextSaveGState(context);
+			CGContextConcatCTM(context, CATransform3DGetAffineTransform(transform));
+			[sublayer renderInContext:context allowCaching:allowCaching];
+			CGContextRestoreGState(context);
+		} else {
+			// take the slow path and render this shit in full 3D
+			[self renderSublayer:sublayer inContext:context with3DTransform:transform];
+		}
 	}
+}
+
+- (void)renderSublayer:(MALayer *)sublayer inContext:(CGContextRef)context with3DTransform:(CATransform3D)transform {
+  	CGRect bounds = sublayer.bounds;
+	CGSize size = bounds.size;
+	size_t width = (size_t)ceil(size.width);
+	size_t height = (size_t)ceil(size.height);
+
+	if (!width || !height)
+		return;
+
+	size_t components = 4;
+	size_t bitsPerComponent = 8;
+	size_t bitsPerPixel = bitsPerComponent * components;
+	size_t bytesPerRow = width * components;
+	CGBitmapInfo bitmapInfo = kCGBitmapByteOrder32Host | kCGImageAlphaPremultipliedLast;
+
+	uint32_t *pixels = malloc(bytesPerRow * height);
+	@onExit {
+		free(pixels);
+	};
+
+	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+	@onExit {
+		CGColorSpaceRelease(colorSpace);
+	};
+
+  	CGContextRef flatContext = CGBitmapContextCreate(
+		pixels,
+		width,
+		height,
+		bitsPerComponent,
+		bytesPerRow,
+		colorSpace,
+		bitmapInfo
+	);
+
+	// render in the context to get the raw pixel data, then discard the context
+	// entirely
+	[sublayer renderInContext:flatContext allowCaching:NO];
+	CGContextRelease(flatContext);
+
+
+	// eventually
+	CGDataProviderRef dataProvider = CGDataProviderCreateWithData(NULL, pixels, bytesPerRow * height, NULL);
+	CGImageRef image = CGImageCreate(
+		width,
+		height,
+		bitsPerComponent,
+		bitsPerPixel,
+		bytesPerRow,
+		colorSpace,
+		bitmapInfo,
+		dataProvider,
+		NULL,
+		YES,
+		kCGRenderingIntentDefault
+	);
+
+	CGDataProviderRelease(dataProvider);
+
+	CGContextDrawImage(context, bounds, image);
+	CGImageRelease(image);
 }
 
 #pragma mark Sublayer management
