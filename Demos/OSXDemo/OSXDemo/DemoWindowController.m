@@ -69,6 +69,11 @@ static const CGPoint anchorArray[5] = {
 	self.textLayer = [[MATextLayer alloc] init];
 	self.textLayer.frame = textFrame;
 
+	CATransform3D transform = CATransform3DIdentity;
+	transform.m34 = 1.0 / -500;
+	transform = CATransform3DRotate(transform, M_PI / 2, 0, 1, 0);
+	self.prettyLayer.sublayerTransform = transform;
+
 	NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
 		(__bridge_transfer id)CGColorCreateGenericGray(1, 1), (__bridge id)kCTForegroundColorAttributeName,
 		(__bridge_transfer id)CTFontCreateUIFontForLanguage(kCTFontSystemFontType, 48, NULL), (__bridge id)kCTFontAttributeName,
