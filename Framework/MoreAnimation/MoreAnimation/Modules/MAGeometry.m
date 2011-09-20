@@ -17,3 +17,8 @@ MAVector3D MAVector3DApplyCATransform3D (MAVector3D v, CATransform3D t) {
     return dst;
 }
 
+MAVector3D MAVector3DDivide (MAVector3D v, CGFloat x) {
+	CGFloat z = 1 / x;
+	return MAVector3DMake(v.x * z, v.y * z, v.z * z, v.w * z);
+}
+

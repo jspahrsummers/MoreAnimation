@@ -23,3 +23,8 @@ typedef struct {
  */
 MAVector3D MAVector3DApplyCATransform3D (MAVector3D v, CATransform3D t);
 
+/**
+ * Divides vector \a v by \a x.
+ */
+MAVector3D MAVector3DDivide (MAVector3D v, CGFloat x);
+
