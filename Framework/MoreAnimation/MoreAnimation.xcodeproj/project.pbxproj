@@ -514,6 +514,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MoreAnimation/MoreAnimation-Prefix.pch";
 				INFOPLIST_FILE = "MoreAnimation/MoreAnimation-Info.plist";
+				OTHER_LDFLAGS = (
+					"-install_name",
+					"\"@executable_path/../Frameworks/MoreAnimation.framework/MoreAnimation\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = framework;
 			};
@@ -528,6 +532,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MoreAnimation/MoreAnimation-Prefix.pch";
 				INFOPLIST_FILE = "MoreAnimation/MoreAnimation-Info.plist";
+				OTHER_LDFLAGS = (
+					"-install_name",
+					"\"@executable_path/../Frameworks/MoreAnimation.framework/MoreAnimation\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = framework;
 			};
