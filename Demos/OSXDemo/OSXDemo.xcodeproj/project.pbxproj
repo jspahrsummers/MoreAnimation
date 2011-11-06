@@ -232,6 +232,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D0355C96141D71600053AF73 /* Build configuration list for PBXNativeTarget "OSXDemo" */;
 			buildPhases = (
+				D0F63501146648BF00D0205A /* ShellScript */,
 				D0355C74141D71600053AF73 /* Sources */,
 				D0355C75141D71600053AF73 /* Frameworks */,
 				D0355C76141D71600053AF73 /* Resources */,
@@ -313,6 +314,22 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		D0F63501146648BF00D0205A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"where?\"";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		D0355C74141D71600053AF73 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -388,6 +405,8 @@
 			baseConfigurationReference = D0918643141D755E005F86FF /* Debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				FRAMEWORK_SEARCH_PATHS = "../../Framework/MoreAnimation/build/$(CONFIGURATION)";
+				HEADER_SEARCH_PATHS = "../../Framework/MoreAnimation/build/$(CONFIGURATION)/MoreAnimation.framework/**";
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
@@ -399,6 +418,8 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "../../Framework/MoreAnimation/build/$(CONFIGURATION)";
+				HEADER_SEARCH_PATHS = "../../Framework/MoreAnimation/build/$(CONFIGURATION)/MoreAnimation.framework/**";
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -406,13 +427,8 @@
 		D0355C97141D71600053AF73 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"./**",
-				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OSXDemo/OSXDemo-Prefix.pch";
-				HEADER_SEARCH_PATHS = "../../Framework/**";
 				INFOPLIST_FILE = "OSXDemo/OSXDemo-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -423,13 +439,8 @@
 		D0355C98141D71600053AF73 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"./**",
-				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OSXDemo/OSXDemo-Prefix.pch";
-				HEADER_SEARCH_PATHS = "../../Framework/**";
 				INFOPLIST_FILE = "OSXDemo/OSXDemo-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
