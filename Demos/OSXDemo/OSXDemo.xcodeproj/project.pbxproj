@@ -412,6 +412,7 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OSXDemo/OSXDemo-Prefix.pch";
+				HEADER_SEARCH_PATHS = "../../Framework/**";
 				INFOPLIST_FILE = "OSXDemo/OSXDemo-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -428,6 +429,7 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OSXDemo/OSXDemo-Prefix.pch";
+				HEADER_SEARCH_PATHS = "../../Framework/**";
 				INFOPLIST_FILE = "OSXDemo/OSXDemo-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
